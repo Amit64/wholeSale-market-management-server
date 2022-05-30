@@ -77,6 +77,36 @@ async function run() {
     const token = jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1d'})
     res.send({result,token}); 
   })
+  //get all user
+  app.get('/user',async (req, res) => {
+    const users = await userCollection.find().toArray();
+    res.send(users)
+  })
+   //make admin panel
+   app.put('/user/admin/:email',verifyJWT,async(req,res)=>{
+    const email= req.params.email;
+    const filter = {email:email};
+    const updateDoc = {
+      $set: {role:'admin'},
+    }
+    const result = await userCollection.updateOne(filter,updateDoc);
+    
+    res.send(result); 
+  })
+  //check admin
+  app.get('/admin/:email',async(req,res)=>{
+    const email = req.params.email;
+    const user = await userCollection.findOne({email:email});
+    const isAdmin = user.role === 'admin';
+    res.send({admin : isAdmin});
+  })
+//add a product
+app.post("/product",async(req,res)=>{
+  const data = req.body;
+  const result = await productCollection.insertOne(data);
+  res.send(result);
+})
+
   } finally {
       //
   }
