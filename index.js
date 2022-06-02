@@ -106,6 +106,19 @@ app.post("/product",async(req,res)=>{
   const result = await productCollection.insertOne(data);
   res.send(result);
 })
+//load all orders
+app.get("/order",async(req,res)=>{
+  const user = req.query.user
+  const order = await orderCollection.find({user: user}).toArray();
+  res.send(order);
+})
+//cancle order
+app.delete('/delete-order',async(req,res)=>{
+  const OrderId = req.query.OrderId
+  const cancleOrder = await orderCollection.deleteOne({OrderId : OrderId});
+  res.send(cancleOrder);
+})
+
 
   } finally {
       //
