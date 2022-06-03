@@ -37,6 +37,7 @@ async function run() {
     const productCollection = client.db("powertools-db").collection("products");
     const orderCollection = client.db("powertools-db").collection("orders");
     const userCollection    = client.db("powertools-db").collection('users');
+    const reviewCollection    = client.db("powertools-db").collection('reviews');
 
     //get feature product
     app.get("/limit-product", async (req, res) => {
@@ -106,7 +107,7 @@ app.post("/product",async(req,res)=>{
   const result = await productCollection.insertOne(data);
   res.send(result);
 })
-//load all orders
+//load all orders by single user
 app.get("/order",async(req,res)=>{
   const user = req.query.user
   const order = await orderCollection.find({user: user}).toArray();
@@ -117,6 +118,28 @@ app.delete('/delete-order',async(req,res)=>{
   const OrderId = req.query.OrderId
   const cancleOrder = await orderCollection.deleteOne({OrderId : OrderId});
   res.send(cancleOrder);
+})
+//delete single product
+app.delete('/delete-product/:id',async(req,res)=>{
+  const id = req.params.id
+  const filter = {_id:ObjectId(id)}
+  const deleteProduct = await productCollection.deleteOne(filter)
+  res.send(deleteProduct);
+})
+//load all orders by all users
+app.get('/all-orders',async(req,res)=>{
+  const allOrders = await orderCollection.find().toArray()
+  res.send(allOrders); 
+})
+//post review
+app.post('/review',async(req,res)=>{
+  const data = req.body;
+  const result = await reviewCollection.insertOne(data);
+  res.send(result);
+})
+app.get('/review',async(req,res)=>{
+  const reviews = await reviewCollection.find().toArray()
+  res.send(reviews); 
 })
 
 
